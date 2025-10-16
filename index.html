@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test dei Desideri</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root{ --bg:#0f0f1a; --card:#17172b; --text:#f7f7ff; --muted:#c8c8d9; --accent1:#ff6bd6; --accent2:#7bffb7; --accent3:#7ac7ff; --radius:20px; }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:Poppins,system-ui,Segoe UI,Roboto,Arial; color:var(--text); background: radial-gradient(1200px 800px at 10% -10%, #1c1c33 0%, #0b0b14 60%), var(--bg);}
+    .wrap{max-width:900px; margin:28px auto; padding:0 14px;}
+    h1{font-weight:800; margin:0 0 8px;}
+    .subtitle{color:var(--muted); margin:10px 0 16px}
+    .section{background:#17172b; border:1px solid rgba(255,255,255,.12); border-radius:var(--radius); padding:16px; margin-bottom:16px}
+    label{display:block; margin:10px 0 6px; font-weight:600}
+    input,select{width:100%; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.2); background:#1a1a33; color:var(--text)}
+    .row{display:grid; grid-template-columns:1fr; gap:12px}
+    @media(min-width:720px){.row{grid-template-columns:repeat(2,1fr)}}
+    .actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:14px}
+    .btn{background:#1a1a33; border:1px solid rgba(255,255,255,.16); color:var(--text); padding:12px 14px; border-radius:12px; cursor:pointer; font-weight:600}
+    .primary{background: linear-gradient(135deg, var(--accent2), var(--accent3)); color:#082019; border:none}
+    .error{color:#ffd36b; font-size:12px; margin-top:6px}
+    .hidden{display:none}
+    /* Test UI */
+    .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
+    @media(min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius); padding:14px; display:flex; gap:10px; align-items:center; cursor:pointer;}
+    .card input{display:none}
+    .card.selected{outline: 3px solid rgba(123,255,183,.65);}
+    .emoji{font-size:26px}
+    .title{font-weight:600}
+    .pill{display:inline-block; padding:6px 10px; border-radius:999px; background:#21213b; border:1px solid rgba(255,255,255,.1); font-size:12px; color:var(--muted)}
+    .qcard{background: #121228; border:1px solid rgba(255,255,255,.1); border-radius: var(--radius); padding:14px; margin:10px 0}
+    .qtitle{font-weight:600; margin-bottom:8px}
+    .options{display:flex; gap:8px; flex-wrap:wrap}
+    .btn.opt{background:#1a1a33; border:1px solid rgba(255,255,255,.16); color:var(--text); padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:600}
+    .btn.opt[data-active="true"]{background: linear-gradient(135deg, var(--accent1), var(--accent3)); color:#0d0d14;}
+    .panel{background:#0f0f22; border:1px solid rgba(255,255,255,.1); border-radius: var(--radius); padding:14px}
+    .legend{display:flex; flex-wrap:wrap; gap:10px; color:var(--muted)}
+    .tag{background:#1b1b33; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.1)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Lingua in prima schermata -->
+    <div class="section">
+      <label for="language" id="label-language">Lingua</label>
+      <select id="language">
+        <option value="it">Italiano</option><option value="en">English</option><option value="fr">Français</option>
+        <option value="es">Español</option><option value="de">Deutsch</option><option value="zh">中文</option><option value="ar">العربية</option>
+      </select>
+    </div>
+
+    <h1 id="title">Test dei Desideri</h1>
+    <div class="subtitle" id="intro-subtitle">Compila prima alcune informazioni sociodemografiche, poi accedi al test ✨</div>
+
+    <!-- Sociodemografico -->
+    <div id="socioDemo" class="section">
+      <div class="row">
+        <div><label id="label-age" for="age">Età</label><input type="number" id="age" min="10" max="120" inputmode="numeric" pattern="[0-9]*"></div>
+        <div>
+          <label id="label-gender" for="gender">Genere</label>
+          <select id="gender">
+            <option value="female" data-i18n="gender.female">Donna</option>
+            <option value="male" data-i18n="gender.male">Uomo</option>
+            <option value="nb" data-i18n="gender.nb">Non binario</option>
+            <option value="na" data-i18n="gender.na">Preferisco non rispondere</option>
+          </select>
+        </div>
+        <div>
+          <label id="label-education" for="education">Titolo di studio</label>
+          <select id="education">
+            <option value="elementary" data-i18n="edu.elementary">Elementari</option>
+            <option value="middle" data-i18n="edu.middle">Medie</option>
+            <option value="high" data-i18n="edu.high">Diploma</option>
+            <option value="degree" data-i18n="edu.degree">Laurea</option>
+            <option value="master" data-i18n="edu.master">Master/Dottorato</option>
+            <option value="other" data-i18n="common.other">Altro</option>
+          </select>
+        </div>
+        <div>
+          <label id="label-job" for="job">Occupazione</label>
+          <select id="job">
+            <option value="student" data-i18n="job.student">Studente</option>
+            <option value="unemployed" data-i18n="job.unemployed">Disoccupato</option>
+            <option value="employee" data-i18n="job.employee">Lavoratore dipendente</option>
+            <option value="self" data-i18n="job.self">Libero professionista</option>
+            <option value="retired" data-i18n="job.retired">Pensionato</option>
+            <option value="other" data-i18n="common.other">Altro</option>
+          </select>
+        </div>
+        <div>
+          <label id="label-status" for="status">Stato civile</label>
+          <select id="status">
+            <option value="single" data-i18n="status.single">Single</option>
+            <option value="couple" data-i18n="status.couple">In coppia</option>
+            <option value="married" data-i18n="status.married">Sposato/a</option>
+            <option value="separated" data-i18n="status.separated">Separato/a</option>
+            <option value="widowed" data-i18n="status.widowed">Vedovo/a</option>
+          </select>
+        </div>
+        <div><label id="label-children" for="children">Numero di figli</label><input type="number" id="children" min="0" max="20" inputmode="numeric" pattern="[0-9]*"></div>
+      </div>
+
+      <label id="label-country" for="country" style="margin-top:10px;">Paese di residenza</label>
+      <select id="country">
+        <option value="IT">Italia</option><option value="FR">Francia</option><option value="DE">Germania</option>
+        <option value="ES">Spagna</option><option value="GB">Regno Unito</option><option value="US">Stati Uniti</option>
+        <option value="CN">Cina</option><option value="JP">Giappone</option><option value="BR">Brasile</option>
+        <option value="AR">Argentina</option><option value="MX">Messico</option><option value="CA">Canada</option>
+      </select>
+      <div id="errorMsg" class="error"></div>
+
+      <div class="actions">
+        <button type="button" class="btn primary" id="startTest">Inizia il test</button>
+      </div>
+    </div>
+
+    <!-- Test -->
+    <div id="testSection" class="hidden">
+      <div class="subtitle" id="phase-intro">Ora puoi iniziare a selezionare i tuoi desideri 🌟</div>
+
+      <div class="section">
+        <div class="pill" id="phase1">Fase 1 · Seleziona i desideri</div>
+        <div class="grid" id="desireGrid"></div>
+        <div class="actions">
+          <button type="button" class="btn" id="clearSelection">Reset</button>
+          <button type="button" class="btn primary" id="toQuestions">Continua →</button>
+        </div>
+      </div>
+
+      <div id="questions"></div>
+
+      <div class="section" id="results" style="display:none">
+        <div class="panel" style="margin-bottom:12px;">
+          <canvas id="radar" height="420"></canvas>
+        </div>
+        <div class="panel">
+          <div class="legend" id="legend"></div>
+          <div class="actions" style="margin-top:12px;">
+            <button type="button" class="btn" id="toggleMode">Mostra distanza (↔︎)</button>
+            <button type="button" class="btn" id="downloadPNG">Scarica grafico</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="subtitle" id="footer" style="margin-top:16px;">Nota: il punteggio è una autovalutazione basata su 6 indicatori...</div>
+    </div>
+  </div>
+
+<script>
+let currentLang = 'it';
+let selected = [];
+let answers = {};
+let radar, showDistance=false;
+
+// I18N (UI+desideri+domande) – le 6 lingue richieste
+const I = {
+  it:{ L:{language:"Lingua", title:"Test dei Desideri", intro:"Compila prima alcune informazioni sociodemografiche, poi accedi al test ✨", age:"Età", gender:"Genere", education:"Titolo di studio", job:"Occupazione", status:"Stato civile", children:"Numero di figli", country:"Paese di residenza", start:"Inizia il test", phaseIntro:"Ora puoi iniziare a selezionare i tuoi desideri 🌟", phase1:"Fase 1 · Seleziona i desideri", reset:"Reset", cont:"Continua →", toggle:"Mostra distanza (↔︎)", download:"Scarica grafico", see:"Vedi risultati ✨", footer:"Nota: il punteggio è una autovalutazione basata su 6 indicatori: chiarezza, azioni, risorse, supporto, ostacoli, controllo personale. Usalo come bussola, non come verdetto 😊", warn:"Per favore compila almeno età" }, G:{female:"Donna", male:"Uomo", nb:"Non binario", na:"Preferisco non rispondere"}, E:{elementary:"Elementari", middle:"Medie", high:"Diploma", degree:"Laurea", master:"Master/Dottorato"}, J:{student:"Studente", unemployed:"Disoccupato", employee:"Lavoratore dipendente", self:"Libero professionista", retired:"Pensionato"}, S:{single:"Single", couple:"In coppia", married:"Sposato/a", separated:"Separato/a", widowed:"Vedovo/a"}, D:["💼 Successo professionale/lavorativo","🚀 Realizzare un grande progetto personale","🌍 Contribuire a un cambiamento sociale","💘 Amore autentico e stabile","👪 Relazioni familiari solide e armoniose","🤝 Amicizie profonde e durature","🧠 Benessere fisico e mentale","🏡 Una casa accogliente/sicura","✈️ Viaggiare e scoprire il mondo","🎭 Espressione creativa/artistica","💶 Stabilità economica/finanziaria","🧭 Libertà e indipendenza personale","✨ Crescita interiore/spiritualità","🏆 Riconoscimento e realizzazione personale","📖 Apprendimento e crescita culturale","🌄 Vivere esperienze nuove e avventurose"], Q:[{k:'clarity',t:'Quanto è CHIARO il desiderio (specifico e misurabile)?',o:['Per nulla','Poco','Abbastanza','Molto','Cristallino'],inv:false},{k:'actions',t:'Stai AGENDO già ora per questo desiderio?',o:['No','Ogni tanto','1-2 azioni/mese','1-2 azioni/settimana','Azioni settimanali+'],inv:false},{k:'resources',t:'Hai RISORSE (tempo, competenze, denaro) sufficienti?',o:['Per nulla','Poche','Parziali','Quasi sufficienti','Sufficienti+'],inv:false},{k:'support',t:'Hai una RETE di supporto (persone/alleati)?',o:['Nessuna','Limitata','Qualche contatto','Buona rete','Rete forte'],inv:false},{k:'obstacles',t:'Gli OSTACOLI ti stanno frenando?',o:['Moltissimo','Molto','Qualche ostacolo','Pochi','Quasi zero'],inv:true},{k:'control',t:'Quanto DIPENDE DA TE (vs. fattori esterni)?',o:['Quasi nulla','Poco','Metà','Molto','Quasi tutto'],inv:false}], R:{prob:"Probabilità di realizzazione", dist:"Distanza dal traguardo"} },
+  en:{ L:{language:"Language", title:"Dreams Test", intro:"Fill in some sociodemographic info, then start the test ✨", age:"Age", gender:"Gender", education:"Education", job:"Occupation", status:"Marital status", children:"Number of children", country:"Country of residence", start:"Start test", phaseIntro:"Now select your dreams 🌟", phase1:"Step 1 · Select your dreams", reset:"Reset", cont:"Continue →", toggle:"Show distance (↔︎)", download:"Download chart", see:"See results ✨", footer:"Note: the score is a self-assessment based on 6 indicators: clarity, actions, resources, support, obstacles, personal control. Use it as a compass, not a verdict 😊", warn:"Please enter at least your age" }, G:{female:"Woman", male:"Man", nb:"Non-binary", na:"Prefer not to answer"}, E:{elementary:"Primary school", middle:"Middle school", high:"High school", degree:"Bachelor's degree", master:"Master/PhD"}, J:{student:"Student", unemployed:"Unemployed", employee:"Employee", self:"Self-employed", retired:"Retired"}, S:{single:"Single", couple:"In a relationship", married:"Married", separated:"Separated", widowed:"Widowed"}, D:["💼 Professional success","🚀 Accomplish a major personal project","🌍 Contribute to social change","💘 Authentic and stable love","👪 Strong and harmonious family relationships","🤝 Deep and lasting friendships","🧠 Physical & mental wellbeing","🏡 A cozy/safe home","✈️ Travel and explore the world","🎭 Creative/artistic expression","💶 Financial stability","🧭 Freedom and personal independence","✨ Inner growth/spirituality","🏆 Recognition and self‑realization","📖 Learning and cultural growth","🌄 New and adventurous experiences"], Q:[{k:'clarity',t:'How CLEAR is the dream (specific & measurable)?',o:['Not at all','A little','Somewhat','Very','Crystal clear'],inv:false},{k:'actions',t:'Are you ACTING on this dream already?',o:['No','Sometimes','1–2 actions/month','1–2 actions/week','Weekly+ actions'],inv:false},{k:'resources',t:'Do you have enough RESOURCES (time, skills, money)?',o:['Not at all','Few','Partial','Almost enough','Enough+'],inv:false},{k:'support',t:'Do you have a SUPPORT network (people/allies)?',o:['None','Limited','Some contacts','Good network','Strong network'],inv:false},{k:'obstacles',t:'Are OBSTACLES holding you back?',o:['Very much','A lot','Some','Few','Almost none'],inv:true},{k:'control',t:'How much depends on YOU (vs external factors)?',o:['Almost nothing','Little','Half','A lot','Almost all'],inv:false}], R:{prob:"Likelihood", dist:"Distance to goal"} },
+  fr:{ L:{language:"Langue", title:"Test des Désirs", intro:"Renseignez d'abord quelques infos, puis commencez ✨", age:"Âge", gender:"Genre", education:"Études", job:"Occupation", status:"État civil", children:"Nombre d’enfants", country:"Pays de résidence", start:"Commencer", phaseIntro:"Sélectionnez vos désirs 🌟", phase1:"Étape 1 · Sélectionnez vos désirs", reset:"Réinitialiser", cont:"Continuer →", toggle:"Afficher la distance (↔︎)", download:"Télécharger le graphique", see:"Voir les résultats ✨", footer:"Autoévaluation basée sur 6 indicateurs : clarté, actions, ressources, soutien, obstacles, contrôle personnel. Boussole, pas verdict 😊", warn:"Indiquez au moins votre âge" }, G:{female:"Femme", male:"Homme", nb:"Non binaire", na:"Je préfère ne pas répondre"}, E:{elementary:"Primaire", middle:"Collège", high:"Lycée", degree:"Licence", master:"Master/Doctorat"}, J:{student:"Étudiant", unemployed:"Sans emploi", employee:"Employé", self:"Indépendant", retired:"Retraité"}, S:{single:"Célibataire", couple:"En couple", married:"Marié(e)", separated:"Séparé(e)", widowed:"Veuf/Veuve"}, D:["💼 Réussite professionnelle","🚀 Mener un grand projet personnel","🌍 Contribuer au changement social","💘 Amour authentique et stable","👪 Relations familiales harmonieuses","🤝 Amitiés profondes et durables","🧠 Bien‑être physique et mental","🏡 Un foyer sûr et chaleureux","✈️ Voyager et découvrir le monde","🎭 Expression créative/artistique","💶 Stabilité financière","🧭 Liberté et indépendance personnelle","✨ Croissance intérieure/spiritualité","🏆 Reconnaissance et accomplissement","📖 Apprentissage et culture","🌄 Vivre de nouvelles aventures"], Q:[{k:'clarity',t:'Ce désir est‑il CLAIR (spécifique & mesurable) ?',o:['Pas du tout','Peu','Assez','Beaucoup','Cristallin'],inv:false},{k:'actions',t:'Agissez‑vous déjà ?',o:['Non','Parfois','1–2 actions/mois','1–2 actions/semaine','Hebdo+'],inv:false},{k:'resources',t:'Avez‑vous des RESSOURCES suffisantes ?',o:['Pas du tout','Peu','Partielles','Presque suffisantes','Suffisantes+'],inv:false},{k:'support',t:'Avez‑vous un RÉSEAU de soutien ?',o:['Aucun','Limité','Quelques contacts','Bon réseau','Réseau fort'],inv:false},{k:'obstacles',t:'Les OBSTACLES vous freinent‑ils ?',o:['Énormément','Beaucoup','Un peu','Peu','Presque pas'],inv:true},{k:'control',t:'Quelle part dépend de VOUS ?',o:['Presque rien','Peu','Moitié','Beaucoup','Presque tout'],inv:false}], R:{prob:"Probabilité", dist:"Distance"} },
+  es:{ L:{language:"Idioma", title:"Test de los Deseos", intro:"Completa primero algunos datos y empieza ✨", age:"Edad", gender:"Género", education:"Educación", job:"Ocupación", status:"Estado civil", children:"Número de hijos", country:"País de residencia", start:"Empezar", phaseIntro:"Ahora selecciona tus deseos 🌟", phase1:"Paso 1 · Selecciona tus deseos", reset:"Reiniciar", cont:"Continuar →", toggle:"Mostrar distancia (↔︎)", download:"Descargar gráfico", see:"Ver resultados ✨", footer:"Autoevaluación basada en 6 indicadores: claridad, acciones, recursos, apoyo, obstáculos, control personal. Brújula, no veredicto 😊", warn:"Indica al menos tu edad" }, G:{female:"Mujer", male:"Hombre", nb:"No binario", na:"Prefiero no responder"}, E:{elementary:"Primaria", middle:"Secundaria básica", high:"Bachillerato", degree:"Grado", master:"Máster/Doctorado"}, J:{student:"Estudiante", unemployed:"Desempleado", employee:"Empleado", self:"Autónomo", retired:"Jubilado"}, S:{single:"Soltero/a", couple:"En pareja", married:"Casado/a", separated:"Separado/a", widowed:"Viudo/a"}, D:["💼 Éxito profesional","🚀 Realizar un gran proyecto personal","🌍 Contribuir al cambio social","💘 Amor auténtico y estable","👪 Relaciones familiares sólidas","🤝 Amistades profundas y duraderas","🧠 Bienestar físico y mental","🏡 Un hogar seguro y acogedor","✈️ Viajar y explorar el mundo","🎭 Expresión creativa/artística","💶 Estabilidad financiera","🧭 Libertad e independencia personal","✨ Crecimiento interior/espiritualidad","🏆 Reconocimiento y autorrealización","📖 Aprendizaje y crecimiento cultural","🌄 Nuevas experiencias aventureras"], Q:[{k:'clarity',t:'¿Qué tan CLARO es el deseo (específico y medible)?',o:['Nada','Poco','Algo','Mucho','Clarísimo'],inv:false},{k:'actions',t:'¿Ya estás ACTUANDO en este deseo?',o:['No','A veces','1–2/mes','1–2/semana','Semanal+'],inv:false},{k:'resources',t:'¿Tienes RECURSOS suficientes?',o:['Nada','Pocos','Parciales','Casi suficientes','Suficientes+'],inv:false},{k:'support',t:'¿Tienes una RED de apoyo?',o:['Ninguna','Limitada','Algunos contactos','Buena red','Red fuerte'],inv:false},{k:'obstacles',t:'¿Los OBSTÁCULOS te frenan?',o:['Muchísimo','Mucho','Algo','Poco','Casi nada'],inv:true},{k:'control',t:'¿Cuánto depende de TI?',o:['Casi nada','Poco','La mitad','Mucho','Casi todo'],inv:false}], R:{prob:"Probabilidad", dist:"Distancia"} },
+  de:{ L:{language:"Sprache", title:"Wunschtest", intro:"Zuerst ein paar Angaben, dann los ✨", age:"Alter", gender:"Geschlecht", education:"Bildung", job:"Beschäftigung", status:"Familienstand", children:"Anzahl der Kinder", country:"Wohnsitzland", start:"Test starten", phaseIntro:"Wähle deine Wünsche 🌟", phase1:"Schritt 1 · Wähle deine Wünsche", reset:"Zurücksetzen", cont:"Weiter →", toggle:"Distanz anzeigen (↔︎)", download:"Diagramm herunterladen", see:"Ergebnisse anzeigen ✨", footer:"Selbsteinschätzung auf Basis von 6 Indikatoren ... Kompass, kein Urteil 😊", warn:"Bitte gib mindestens dein Alter an" }, G:{female:"Frau", male:"Mann", nb:"Nicht-binär", na:"Keine Angabe"}, E:{elementary:"Grundschule", middle:"Mittelschule", high:"Abitur", degree:"Bachelor", master:"Master/Promotion"}, J:{student:"Student", unemployed:"Arbeitslos", employee:"Angestellt", self:"Selbstständig", retired:"Ruhestand"}, S:{single:"Ledig", couple:"In Beziehung", married:"Verheiratet", separated:"Getrennt", widowed:"Verwitwet"}, D:["💼 Beruflicher Erfolg","🚀 Großes persönliches Projekt","🌍 Gesellschaftlichen Wandel unterstützen","💘 Authentische, stabile Liebe","👪 Starke Familienbeziehungen","🤝 Tiefe Freundschaften","🧠 Körperliches & mentales Wohlbefinden","🏡 Ein sicheres Zuhause","✈️ Reisen & die Welt entdecken","🎭 Kreative/künstlerische Entfaltung","💶 Finanzielle Stabilität","🧭 Freiheit & persönliche Unabhängigkeit","✨ Innere Entwicklung/Spiritualität","🏆 Anerkennung & Selbstverwirklichung","📖 Lernen & kulturelles Wachstum","🌄 Neue, abenteuerliche Erfahrungen"], Q:[{k:'clarity',t:'Wie KLAR ist der Wunsch (spezifisch & messbar)?',o:['Gar nicht','Wenig','Etwas','Sehr','Kristallklar'],inv:false},{k:'actions',t:'Arbeitest du bereits daran?',o:['Nein','Manchmal','1–2/Monat','1–2/Woche','Wöchentlich+'],inv:false},{k:'resources',t:'Hast du genügend RESSOURCEN?',o:['Gar nicht','Wenig','Teilweise','Fast genug','Genug+'],inv:false},{k:'support',t:'Hast du ein UNTERSTÜTZUNGSnetz?',o:['Keins','Begrenzt','Einige Kontakte','Gutes Netz','Starkes Netz'],inv:false},{k:'obstacles',t:'Halten dich HINDERNISSE auf?',o:['Sehr','Stark','Etwas','Wenig','Kaum'],inv:true},{k:'control',t:'Wieviel hängt von DIR ab?',o:['Fast nichts','Wenig','Zur Hälfte','Viel','Fast alles'],inv:false}], R:{prob:"Wahrscheinlichkeit", dist:"Distanz"} },
+  zh:{ L:{language:"语言", title:"愿望测试", intro:"先填写一些信息，然后开始测试 ✨", age:"年龄", gender:"性别", education:"教育程度", job:"职业", status:"婚姻状况", children:"子女数量", country:"居住国家", start:"开始测试", phaseIntro:"现在选择你的愿望 🌟", phase1:"步骤 1 · 选择你的愿望", reset:"重置", cont:"继续 →", toggle:"显示距离 (↔︎)", download:"下载图表", see:"查看结果 ✨", footer:"这是基于6个指标的自我评估… 😊", warn:"请至少填写年龄" }, G:{female:"女性", male:"男性", nb:"非二元", na:"不愿回答"}, E:{elementary:"小学", middle:"初中", high:"高中", degree:"本科", master:"硕士/博士"}, J:{student:"学生", unemployed:"失业", employee:"雇员", self:"自由职业", retired:"退休"}, S:{single:"单身", couple:"恋爱中", married:"已婚", separated:"分居", widowed:"丧偶"}, D:["💼 职业成功","🚀 重要个人项目","🌍 社会变革贡献","💘 真实稳定的爱","👪 和谐的家庭关系","🤝 深厚持久的友谊","🧠 身心健康","🏡 安全舒适的家","✈️ 旅行探索世界","🎭 创意/艺术表达","💶 财务稳定","🧭 自由与独立","✨ 内在成长/灵性","🏆 认可与自我实现","📖 学习与文化成长","🌄 冒险新体验"], Q:[{k:'clarity',t:'愿望是否清晰（具体且可衡量）？',o:['完全不','有点','一般','很清晰','非常清晰'],inv:false},{k:'actions',t:'你是否已经在为此行动？',o:['没有','偶尔','每月1–2次','每周1–2次','每周多次'],inv:false},{k:'resources',t:'资源是否充足？',o:['完全不','较少','部分','接近足够','足够+'],inv:false},{k:'support',t:'是否有支持网络？',o:['没有','有限','一些','良好','强大'],inv:false},{k:'obstacles',t:'障碍是否阻碍你？',o:['非常多','很多','一些','较少','几乎没有'],inv:true},{k:'control',t:'有多少取决于你？',o:['几乎没有','很少','一半','很多','几乎全部'],inv:false}], R:{prob:"实现概率", dist:"距离目标"} },
+  ar:{ L:{language:"اللغة", title:"اختبار الأمنيات", intro:"املأ بعض البيانات ثم ابدأ ✨", age:"العمر", gender:"النوع", education:"التعليم", job:"العمل", status:"الحالة الاجتماعية", children:"عدد الأطفال", country:"بلد الإقامة", start:"ابدأ الاختبار", phaseIntro:"اختر أمنياتك الآن 🌟", phase1:"الخطوة 1 · اختر أمنياتك", reset:"إعادة تعيين", cont:"متابعة →", toggle:"إظهار المسافة (↔︎)", download:"تنزيل الرسم", see:"عرض النتائج ✨", footer:"تقييم ذاتي مبني على 6 مؤشرات… 😊", warn:"يُرجى إدخال العمر" }, G:{female:"امرأة", male:"رجل", nb:"غير ثنائي", na:"أفضل عدم الإجابة"}, E:{elementary:"ابتدائي", middle:"إعدادي", high:"ثانوي", degree:"بكالوريوس", master:"ماجستير/دكتوراه"}, J:{student:"طالب", unemployed:"عاطل", employee:"موظف", self:"عمل حر", retired:"متقاعد"}, S:{single:"أعزب", couple:"مرتبط", married:"متزوج", separated:"منفصل", widowed:"أرمل"}, D:["💼 نجاح مهني","🚀 مشروع شخصي كبير","🌍 المساهمة في التغيير الاجتماعي","💘 حب أصيل ومستقر","👪 علاقات أسرية متينة","🤝 صداقات عميقة ودائمة","🧠 صحة نفسية وجسدية","🏡 منزل آمن ودافئ","✈️ السفر واستكشاف العالم","🎭 تعبير إبداعي/فني","💶 استقرار مالي","🧭 حرية واستقلال شخصي","✨ نمو داخلي/روحاني","🏆 اعتراف وتحقيق ذات","📖 تعلم ونمو ثقافي","🌄 تجارب جديدة ومغامرة"], Q:[{k:'clarity',t:'ما مدى وضوح الأمنية؟',o:['لا شيء','قليل','متوسط','كبير','واضح جدًا'],inv:false},{k:'actions',t:'هل تعمل على هذه الأمنية؟',o:['لا','أحيانًا','1–2/شهر','1–2/أسبوع','أسبوعيًا+'],inv:false},{k:'resources',t:'هل الموارد كافية؟',o:['لا','قليل','جزئي','يكاد يكفي','يكفي+'],inv:false},{k:'support',t:'هل لديك شبكة دعم؟',o:['لا','محدودة','بعض الاتصالات','شبكة جيدة','شبكة قوية'],inv:false},{k:'obstacles',t:'هل العوائق تعرقل تقدمك؟',o:['جداً','كثيراً','بعض الشيء','قليل','تقريبًا لا'],inv:true},{k:'control',t:'كم يعتمد الأمر عليك؟',o:['تقريبًا لا','قليل','النصف','كثير','تقريبًا كل شيء'],inv:false}], R:{prob:"الاحتمال", dist:"المسافة"} }
+};
+
+const KEYS = ['lavoro','progetto','impatto','amore','famiglia','amici','benessere','casa','viaggi','arte','soldi','indipendenza','spiritualita','riconoscimento','conoscenza','avventura'];
+
+function t(){ return I[currentLang]; }
+
+// Apply language to all UI
+function applyLang(){
+  document.documentElement.lang = currentLang;
+  const L = t().L;
+  // labels
+  document.getElementById('label-language').innerText = L.language;
+  document.getElementById('title').innerText = L.title;
+  document.getElementById('intro-subtitle').innerText = L.intro;
+  document.getElementById('label-age').innerText = L.age;
+  document.getElementById('label-gender').innerText = L.gender;
+  document.getElementById('label-education').innerText = L.education;
+  document.getElementById('label-job').innerText = L.job;
+  document.getElementById('label-status').innerText = L.status;
+  document.getElementById('label-children').innerText = L.children;
+  document.getElementById('label-country').innerText = L.country;
+  document.getElementById('startTest').innerText = L.start;
+  document.getElementById('phase-intro').innerText = L.phaseIntro;
+  document.getElementById('phase1').innerText = L.phase1;
+  document.getElementById('clearSelection').innerText = L.reset;
+  document.getElementById('toQuestions').innerText = L.cont;
+  document.getElementById('toggleMode').innerText = L.toggle;
+  document.getElementById('downloadPNG').innerText = L.download;
+  document.getElementById('footer').innerText = L.footer;
+
+  // translate dropdown options with data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const path = el.getAttribute('data-i18n').split('.'); // e.g. gender.female
+    let node = I[currentLang];
+    for(const p of path){ node = node && node[p]; }
+    if(node){ el.textContent = node; }
+  });
+
+  // rebuild desires grid
+  buildDesires();
+  // if questions already visible, rebuild them in new language
+  if (document.getElementById('questions').children.length) renderQuestions();
+}
+
+function buildDesires(){
+  const grid = document.getElementById('desireGrid');
+  grid.innerHTML = '';
+  t().D.forEach((label, idx)=> addCard(grid, KEYS[idx], label));
+  selected = []; // reset selection to avoid mismatches across languages
+  answers = {};
+  document.getElementById('questions').innerHTML='';
+  document.getElementById('results').style.display='none';
+}
+
+function addCard(parent, key, label){
+  const card = document.createElement('label');
+  card.className = 'card';
+  card.innerHTML = `<input type="checkbox" data-key="${key}"><div class="emoji">${label.split(' ')[0]}</div><div class="title">${label.substring(2)}</div>`;
+  parent.appendChild(card);
+  const input = card.querySelector('input');
+  input.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      if (selected.length >= 8) { e.target.checked = false; return; }
+      selected.push(key); card.classList.add('selected');
+    } else { selected = selected.filter(k => k!==key); card.classList.remove('selected'); }
+  });
+}
+
+function renderQuestions(){
+  const holder = document.getElementById('questions');
+  holder.innerHTML = '';
+  const Q = t().Q;
+
+  selected.forEach((key,i)=>{
+    const el = document.querySelector(`input[data-key="${key}"]`).parentElement;
+    const label = el.querySelector('.emoji').textContent + ' ' + el.querySelector('.title').textContent;
+    const block = document.createElement('div');
+    block.className = 'qcard';
+    block.innerHTML = `<div class="qtitle">${i+1}. ${label}</div>`;
+
+    Q.forEach(q => {
+      const row = document.createElement('div');
+      row.style.margin = '10px 0 14px';
+      row.innerHTML = `<div style="margin-bottom:6px; color:var(--muted)">${q.t}</div>`;
+      const opts = document.createElement('div');
+      opts.className = 'options';
+      q.o.forEach((lab, idx)=>{
+        const b = document.createElement('button');
+        b.className = 'btn opt'; b.textContent = lab; b.setAttribute('data-active','false');
+        b.onclick = ()=>{
+          [...opts.children].forEach(el=>el.setAttribute('data-active','false'));
+          b.setAttribute('data-active','true');
+          if (!answers[key]) answers[key] = {};
+          answers[key][q.k] = idx;
+        };
+        opts.appendChild(b);
+      });
+      row.appendChild(opts); block.appendChild(row);
+    });
+
+    holder.appendChild(block);
+  });
+
+  const go = document.createElement('div');
+  go.className = 'actions';
+  go.innerHTML = `<button type="button" class="btn primary" id="seeResults">${t().L.see}</button>`;
+  holder.appendChild(go);
+  document.getElementById('seeResults').onclick = computeAndShow;
+}
+
+function computeScoreFor(desireKey){
+  const a = answers[desireKey] || {};
+  const Q = t().Q;
+  let sum = 0, max = 0;
+  Q.forEach(q=>{
+    const v = (a[q.k] ?? 0);
+    const val = q.inv ? (4 - v) : v;
+    sum += (val/4);
+    max += 1;
+  });
+  const ratio = (max? sum/max : 0);
+  return Math.round(ratio*100);
+}
+
+function computeAndShow(){
+  const Q = t().Q;
+  for(const k of selected){
+    if(!answers[k] || Object.keys(answers[k]).length < Q.length){
+      alert(t().L.warn);
+      return;
+    }
+  }
+  const labels = selected.map(k => {
+    const el = document.querySelector(`input[data-key="${k}"]`).parentElement;
+    return el.querySelector('.emoji').textContent + ' ' + el.querySelector('.title').textContent;
+  });
+  const scores = selected.map(k => computeScoreFor(k));
+  const dataToPlot = showDistance ? scores.map(s=>100-s) : scores;
+
+  const legend = document.getElementById('legend');
+  legend.innerHTML = '';
+  selected.forEach((k,i)=>{
+    const chip = document.createElement('div');
+    chip.className = 'tag';
+    chip.textContent = `${labels[i]} → ${showDistance? (100-scores[i]) : scores[i]}%`;
+    legend.appendChild(chip);
+  });
+
+  document.getElementById('results').style.display = '';
+
+  const ctx = document.getElementById('radar');
+  if (radar) radar.destroy();
+  radar = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [{
+        label: showDistance? t().R.dist : t().R.prob,
+        data: dataToPlot,
+        fill: true,
+        backgroundColor: 'rgba(123,255,183,0.25)',
+        borderColor: 'rgba(122,199,255,1)',
+        pointBackgroundColor: '#ffffff',
+        pointBorderColor: 'rgba(255,255,255,.6)',
+        pointRadius: 4,
+        borderWidth: 3,
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { r: { suggestedMin:0, suggestedMax:100, grid:{color:'rgba(255,255,255,.1)'}, angleLines:{color:'rgba(255,255,255,.15)'}, pointLabels:{color:'#eaeaf6', font:{size:12, weight:'600'}}, ticks:{display:true, color:'#bfbfdf', backdropColor:'transparent', stepSize:20} } },
+      plugins: { legend:{ labels:{ color:'#eaeaf6' } } }
+    }
+  });
+}
+
+// Event wiring
+document.getElementById('language').addEventListener('change', e=>{
+  currentLang = e.target.value;
+  applyLang();
+});
+
+document.getElementById('startTest').addEventListener('click', ()=>{
+  const age = document.getElementById('age').value.trim();
+  if(!age){
+    document.getElementById('errorMsg').textContent = t().L.warn;
+  } else {
+    document.getElementById('errorMsg').textContent = '';
+  }
+  // Procede comunque al test anche se mancano campi, per evitare blocchi su mobile
+  document.getElementById('socioDemo').classList.add('hidden');
+  document.getElementById('testSection').classList.remove('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
+  applyLang(); // per assicurare traduzione anche nella schermata test
+});
+
+document.getElementById('clearSelection').addEventListener('click', ()=>{
+  selected = []; answers = {};
+  document.querySelectorAll('#desireGrid input').forEach(i=>{i.checked=false; i.closest('.card').classList.remove('selected');});
+  document.getElementById('questions').innerHTML='';
+  document.getElementById('results').style.display='none';
+});
+
+document.getElementById('toQuestions').addEventListener('click', ()=>{
+  if (!selected.length) { alert(t().L.warn); return; }
+  renderQuestions();
+  window.scrollTo({top: document.getElementById('questions').offsetTop - 10, behavior:'smooth'});
+});
+
+document.getElementById('toggleMode').addEventListener('click', ()=>{
+  showDistance = !showDistance;
+  computeAndShow();
+});
+
+document.getElementById('downloadPNG').addEventListener('click', ()=>{
+  const link = document.createElement('a');
+  link.download = 'radar_desideri.png';
+  link.href = document.getElementById('radar').toDataURL('image/png');
+  link.click();
+});
+
+// Init
+applyLang();
+buildDesires();
+</script>
+</body>
+</html>
