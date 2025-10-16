@@ -3,6 +3,11 @@
 <script>
   const ENDPOINT   = "https://script.google.com/macros/s/AKfycbwQHHP7F2jrrMcuI5ZMwTX2H6C9bhsUJ0qPNG9GtL6RJyobVevcrCi9UaYlso4I2GkJ/exec";
   const SECRET_KEY = "Sara-Desideri-2025-key-87cA!x"; 
+  await fetch(`${ENDPOINT}?key=${encodeURIComponent(SECRET_KEY)}`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+  body: JSON.stringify(records)  // records = array di oggetti riga
+});
 </script>
 <head>
   <meta charset="UTF-8" />
