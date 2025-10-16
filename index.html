@@ -3,12 +3,31 @@
 <script>
   const ENDPOINT   = "https://script.google.com/macros/s/AKfycbwQHHP7F2jrrMcuI5ZMwTX2H6C9bhsUJ0qPNG9GtL6RJyobVevcrCi9UaYlso4I2GkJ/exec";
   const SECRET_KEY = "Sara-Desideri-2025-key-87cA!x"; 
-  await fetch(`${ENDPOINT}?key=${encodeURIComponent(SECRET_KEY)}`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-  body: JSON.stringify(records)  // records = array di oggetti riga
-});
+  <script>
+  // METTI QUI IL TUO /exec (quello attivo)
+  const ENDPOINT   = "https://script.google.com/macros/s/AKfycbwQHHP7F2jrrMcuI5ZMwTX2H6C9bhsUJ0qPNG9GtL6RJyobVevcrCi9UaYlso4I2GkJ/exec";
+  // LA STESSA CHIAVE di Apps Script
+  const SECRET_KEY = "Sara-Desideri-2025-key-87cA!x";
 </script>
+  async function sendToSheet(records){
+  try{
+    const survey_id = (crypto.randomUUID && crypto.randomUUID()) || String(Date.now());
+    const enriched = records.map(r => ({ ...r, survey_id }));
+    const url = `${ENDPOINT}?key=${encodeURIComponent(SECRET_KEY)}`;
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(enriched)
+    });
+    const text = await res.text();
+    console.log('POST →', url);
+    console.log('Body →', enriched);
+    console.log('Risposta ←', res.status, text);
+  }catch(e){
+    console.log('Invio a Sheet non riuscito:', e);
+  }
+}
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
